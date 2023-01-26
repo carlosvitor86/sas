@@ -9,11 +9,6 @@ if(@$_GET['pagina'] != ""){
 	$pagina = 'home';
 }
 
-$query = $pdo->query("select * from usuarios where id = 'SAS'");
-$res = $query->fetchAll(PDO::FETCH_ASSOC);
-$total_reg = @count($res);
-
-
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -67,6 +62,8 @@ $total_reg = @count($res);
 	<script type="text/javascript">
 
 		$(document).ready(function () {
+
+			carregarDados();
 
 			$('#conteudo_principal').css('display', 'block');
 
@@ -221,10 +218,10 @@ $total_reg = @count($res);
 						<li class="dropdown profile_details_drop">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 								<div class="profile_img">	
-									<span class="prfil-img"><img src="images/perfil/sem-foto.jpg" alt="" width="50px" height="50px"> </span> 
+									<span class="prfil-img"><img id="foto-usuario" src="images/perfil/sem-foto.jpg" alt="" width="50px" height="50px"> </span> 
 									<div class="user-name esc">
-										<p>Nome Usuário</p>
-										<span>Nível Usuário</span>
+										<p id="nome-usuario"></p>
+										<span>Nível: <span id="nivel-usuario"></span></span>
 									</div>
 									<i class="fa fa-angle-down lnr"></i>
 									<i class="fa fa-angle-up lnr"></i>
@@ -343,12 +340,12 @@ $total_reg = @count($res);
 					<div class="row">
 						<div class="col-md-6">							
 								<label>Nome</label>
-								<input type="text" class="form-control" id="nome_perfil" name="nome" placeholder="Seu Nome" value="<?php echo $nome_usuario ?>" required>							
+								<input type="text" class="form-control" id="nome_perfil" name="nome" placeholder="Seu Nome" required>							
 						</div>
 
 						<div class="col-md-6">							
 								<label>Email</label>
-								<input type="email" class="form-control" id="email_perfil" name="email" placeholder="Seu Nome" value="<?php echo $email_usuario ?>" required>							
+								<input type="email" class="form-control" id="email_perfil" name="email" placeholder="Seu Email"  required>							
 						</div>
 					</div>
 
@@ -356,12 +353,12 @@ $total_reg = @count($res);
 					<div class="row">
 						<div class="col-md-6">							
 								<label>Telefone</label>
-								<input type="text" class="form-control" id="telefone_perfil" name="telefone" placeholder="Seu Telefone" value="<?php echo $telefone_usuario ?>" required>							
+								<input type="text" class="form-control" id="telefone_perfil" name="telefone" placeholder="Seu Telefone">							
 						</div>
 
 						<div class="col-md-6">							
 								<label>CPF</label>
-								<input type="text" class="form-control" id="cpf_perfil" name="cpf" placeholder="Seu CPF" value="<?php echo $cpf_usuario ?>">							
+								<input type="text" class="form-control" id="cpf_perfil" name="cpf" placeholder="Seu CPF" required>							
 						</div>
 					</div>
 
@@ -370,12 +367,19 @@ $total_reg = @count($res);
 					<div class="row">
 						<div class="col-md-6">							
 								<label>Senha</label>
-								<input type="password" class="form-control" id="senha_perfil" name="senha" placeholder="Senha" value="<?php echo $senha_usuario ?>" required>							
+								<input type="password" class="form-control" id="senha_perfil" name="senha" placeholder="Senha" required>							
 						</div>
 
 						<div class="col-md-6">							
 								<label>Confirmar Senha</label>
-								<input type="password" class="form-control" id="conf_senha_perfil" name="conf_senha" placeholder="Confirmar Senha" value="" required>							
+								<input type="password" class="form-control" id="conf_senha_perfil" name="conf_senha" placeholder="Confirmar Senha" required>							
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-12">							
+								<label>Endereço</label>
+								<input type="text" class="form-control" id="endereco_perfil" name="endereco" placeholder="Endereço">							
 						</div>
 					</div>
 
@@ -387,7 +391,7 @@ $total_reg = @count($res);
 						</div>
 
 						<div class="col-md-6">								
-							<img src="images/perfil/<?php echo $foto_usuario ?>"  width="80px" id="target-usu">								
+							<img src=""  width="80px" id="target-usu">								
 							
 						</div>
 
@@ -727,4 +731,31 @@ $total_reg = @count($res);
             target.src = "";
         }
     }
+</script>
+
+<script type="text/javascript">
+	function carregarDados(){
+		var id_usu = localStorage.id_usu;
+		
+		$.ajax({
+			url: "carregar-dados.php",
+			type: 'POST',
+			data: {id_usu},
+
+			success: function (mensagem) {
+				var split = mensagem.split("-*");
+				$('#nome-usuario').text(split[0]);
+				$('#nivel-usuario').text(split[1]);
+				$('#foto-usuario').attr("src","imagens/perfil/" + split[2]);
+
+				$('#nome_perfil').val(split[0]);
+				$('#target-usu').attr("src","imagens/perfil/" + split[2]);
+				$('#email_perfil').val(split[3]);
+				$('#telefone_perfil').val(split[4]);
+				$('#cpf_perfil').val(split[5]);
+				$('#senha_perfil').val(split[6]);
+				$('#endereco_perfil').val(split[7]);
+			},			
+		});
+	}
 </script>
